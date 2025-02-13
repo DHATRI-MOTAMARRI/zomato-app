@@ -1,10 +1,10 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async() => {
     let currentPage = 1;
     const limit = 10;
     let currentSearchParams = new URLSearchParams();
     let predictedCuisine = null;
+    const BASE_URL = window.location.origin;  // This will get the deployed URL
 
-   
     window.getCurrentLocation = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -23,8 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-
-    window.searchByLocation = () => {
+    window.searchByLocation = async function()  {
         const lat = document.getElementById('latitude').value;
         const lon = document.getElementById('longitude').value;
         const radius = document.getElementById('radius').value || 3;
@@ -47,7 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    
     window.uploadImage = async () => {
         const fileInput = document.getElementById('imageUpload');
         const file = fileInput.files[0];
@@ -64,7 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             cuisineResult.textContent = 'Analyzing image...';
             
-            const response = await fetch('http://127.0.0.1:5000/predict-cuisine', {
+            // Updated to use BASE_URL instead of localhost
+            const response = await fetch(`${BASE_URL}/predict-cuisine`, {
                 method: 'POST',
                 body: formData,
                 timeout: 30000                 
@@ -83,14 +82,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    
     window.searchByCuisine = () => {
         if (!predictedCuisine) {
             alert('Please detect a cuisine first');
             return;
         }
 
-        
         const lat = document.getElementById('latitude').value;
         const lon = document.getElementById('longitude').value;
         const radius = document.getElementById('radius').value || 3;
@@ -113,7 +110,8 @@ document.addEventListener("DOMContentLoaded", () => {
         params.append('page', currentPage);
         params.append('limit', limit);
 
-        fetch(`http://127.0.0.1:5000/restaurants?${params.toString()}`)
+        // Updated to use BASE_URL instead of localhost
+        fetch(`${BASE_URL}/restaurants?${params.toString()}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -137,7 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-  
     function displayRestaurants(restaurants) {
         const restaurantContainer = document.getElementById("restaurant-list");
         restaurantContainer.innerHTML = "";
@@ -163,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
 
             const ratingColor = rating.rating_color || '666666';
-            const distanceText = item.distance ? `<p class="distance">${item.distance} km away</p>` : '';
+            const distanceText = item.distance ? `<p class="distance">${item.distance.toFixed(2)} km away</p>` : '';
 
             card.innerHTML = `
                 <div class="restaurant-info">
