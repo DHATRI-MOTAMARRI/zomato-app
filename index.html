@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZOMATO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+        }
+
+        .left-panel {
+            width: 250px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            position: absolute;
+            left: 20px;
+            top: 85px;
+        }
+        .left-panel h3 {
+            margin-top: 0;
+        }
+        .left-panel label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .left-panel select,
+        .left-panel input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .left-panel button {
+            margin-top: 10px;
+            width: 100%;
+        }
+        .search-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+
+        .search-container input {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .search-container button {
+            padding: 8px 15px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px; /* Adds spacing between inputs */
+            width: 100%;
+        }
+
+        .input-group input {
+            flex: 1; /* Makes inputs equal in size */
+        }
+
+        .restaurant-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .restaurant-card:hover {
+            background-color: #f5f5f5;
+        }
+        .restaurant-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+        .restaurant-info {
+            display: flex;
+            align-items: start;
+        }
+        .restaurant-details {
+            flex-grow: 1;
+        }
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 8px 12px;
+            margin: 5px;
+            border: none;
+            background-color: #ec0000;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .distance {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .search-container:last-of-type {
+            position: absolute;
+            top: 85px;
+            right: 20px;
+            width: 250px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pagination button {
+            border-radius: 20px;
+            padding: 10px 15px;
+        }
+
+        #imageUpload {
+            width: 240px; 
+            padding: 5px; 
+            font-size: 12px;
+        }
+
+        #averageSpend
+        {
+            width: 235px;
+        }
+
+
+    </style>
+</head>
+<body>
+    <h2>Restaurant List</h2>
+    
+    <div class="content-container">
+        <div class="search-container">
+            <h3>Location Search</h3>
+            <div class="input-group">
+                <input type="number" id="latitude" placeholder="Latitude" step="any">
+                <input type="number" id="longitude" placeholder="Longitude" step="any">
+                <input type="number" id="radius" placeholder="Radius (km)" step="0.1" value="3">
+                <button onclick="searchByLocation()">Search</button>
+            </div>
+            <button onclick="getCurrentLocation()">Use My Location</button>
+        </div>
+               
+    
+        <div id="restaurant-list" class="restaurant-list"></div>
+    </div>
+
+
+     <div class="left-panel">
+        <h3>Filter Options</h3>
+
+        <label for="country">Country</label>
+        <select id="country">
+            <option value="">Select Country</option>
+            <option value="India">India</option>
+            <option value="USA">USA</option>
+            <option value="UK">UK</option>
+        </select>
+
+        <label for="averageSpend">Avg Spend (for 2)</label>
+        <input type="number" id="averageSpend" placeholder="Enter amount">
+
+        <label for="cuisine">Cuisines</label>
+        <select id="cuisine">
+            <option value="">Select Cuisine</option>
+            <option value="Indian">Indian</option>
+            <option value="Chinese">Chinese</option>
+            <option value="Italian">Italian</option>
+            <option value="Mexican">Mexican</option>
+        </select>
+
+        <button onclick="applyFilters()">Apply Filters</button>
+    </div>
+
+
+    <div id="restaurant-list"></div>
+
+    <div class="pagination">
+        <button id="prev-btn">Previous</button>
+        <span id="page-number">1</span>
+        <button id="next-btn">Next</button>
+    </div>
+
+    <div class="search-container">
+        <h3>Upload an Image to Detect Cuisine</h3>
+        <input type="file" id="imageUpload" accept="image/*">
+        <button onclick="uploadImage()">Detect Cuisine</button>
+        <p id="cuisineResult"></p>
+        <button onclick="searchByCuisine()">Search</button>
+    </div>
+
+
+    <script src="script.js"></script>
+</body>
+</html>
