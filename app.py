@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -18,6 +18,16 @@ collection = db["restaurants"]
 API_KEY = "AIzaSyDnArxi9YkbGGE9UYhxzA8GsvKIXZWRJ9U" 
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-2.0-flash-exp")
+
+
+@app.route('/')
+def serve_index():
+    return send_from_directory('.', 'index.html')
+
+# Add route to serve static files (like script.js)
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory('.', path)
 
 def calculate_distance(lat1, lon1, lat2, lon2):
     # Convert to radians
