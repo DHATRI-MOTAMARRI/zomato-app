@@ -105,6 +105,54 @@ document.addEventListener("DOMContentLoaded", async() => {
         fetchRestaurants();
     };
 
+    window.applyFilters = function() {
+        const averageSpend = document.getElementById('averageSpend').value;
+        
+        currentSearchParams = new URLSearchParams();
+    
+        // Add only the average spend filter
+        if (averageSpend) {
+            currentSearchParams.set('averageSpend', averageSpend);
+        }
+        
+        // Reset to first page when applying filters
+        currentPage = 1;
+        
+        // Fetch restaurants with only the filter
+        fetchRestaurants();
+    };
+
+    window.combineFilters = function() {
+        const averageSpend = document.getElementById('averageSpend').value;
+        const lat = document.getElementById('latitude').value;
+        const lon = document.getElementById('longitude').value;
+        const radius = document.getElementById('radius').value || 3;
+    
+        // Start with a new URLSearchParams
+        let params = new URLSearchParams();
+    
+        // Add location parameters if they exist
+        if (lat && lon) {
+            params.set('latitude', lat);
+            params.set('longitude', lon);
+            params.set('radius', radius);
+        }
+    
+        // Add cuisine if it exists
+        if (predictedCuisine) {
+            params.set('cuisine', predictedCuisine);
+        }
+    
+        // Add average spend if it exists
+        if (averageSpend) {
+            params.set('averageSpend', averageSpend);
+        }
+    
+        currentSearchParams = params;
+        currentPage = 1;
+        fetchRestaurants();
+    };
+
     function fetchRestaurants() {
         const params = new URLSearchParams(currentSearchParams);
         params.append('page', currentPage);
