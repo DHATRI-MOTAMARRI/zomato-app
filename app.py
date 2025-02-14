@@ -97,28 +97,30 @@ def get_restaurants():
         limit = int(request.args.get('limit', 10))
         skip = (page - 1) * limit
 
-        # Get location search parameters
         lat = request.args.get('latitude')
         lon = request.args.get('longitude')
-        radius = float(request.args.get('radius', 3.0))  # Default 3km radius
+        radius = float(request.args.get('radius', 3.0))  
         
-        # Get cuisine filter from predicted cuisine
         cuisine = request.args.get('cuisine')
+        average_spend = request.args.get('averageSpend')
+
+        query = {}
+        
+        if cuisine:
+            query['restaurant.cuisines'] = {'$regex': cuisine, '$options': 'i'}
+            
+        if average_spend:
+            try:
+                avg_spend_value = int(average_spend)
+                query['restaurant.average_cost_for_two'] = avg_spend_value
+            except ValueError:
+                pass
 
         if lat and lon:
             lat = float(lat)
             lon = float(lon)
             
-            # Find all restaurants and filter by distance and cuisine
-            query = {}
-            if cuisine:
-                query = {
-                    "restaurant.cuisines": {
-                        "$regex": cuisine,
-                        "$options": "i"
-                    }
-                }
-            
+            # Find restaurants matching query and filter by distance
             all_restaurants = list(collection.find(query))
             filtered_restaurants = []
             
@@ -133,8 +135,10 @@ def get_restaurants():
                     restaurant["_id"] = str(restaurant["_id"])
                     filtered_restaurants.append(restaurant)
             
+           
             filtered_restaurants.sort(key=lambda x: x['distance'])
             
+            # Apply pagination
             start_idx = skip
             end_idx = start_idx + limit
             paginated_restaurants = filtered_restaurants[start_idx:end_idx]
@@ -146,16 +150,7 @@ def get_restaurants():
                 "restaurants": paginated_restaurants
             }), 200
         else:
-            # Regular pagination without location filtering, but with cuisine filtering
-            query = {}
-            if cuisine:
-                query = {
-                    "restaurant.cuisines": {
-                        "$regex": cuisine,
-                        "$options": "i"
-                    }
-                }
-            
+            # Regular pagination with query filters
             restaurants = list(collection.find(query).skip(skip).limit(limit))
             for restaurant in restaurants:
                 restaurant["_id"] = str(restaurant["_id"])
